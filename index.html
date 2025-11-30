@@ -1,648 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Spider Solitaire – Flower Backs (4 Suits)</title>
-  <style>
-    :root {
-      /* Card back: pink flower in vase from Pixabay */
-      --card-back-url: url("https://cdn.pixabay.com/photo/2018/02/23/12/38/flower-3175428_1280.jpg");
-    }
+<meta charset="UTF-8" />
+<title>Spider Solitaire – Fixed Version</title>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+:root {
+  --card-back-url: url("https://cdn.pixabay.com/photo/2018/02/23/12/38/flower-3175428_1280.jpg");
+}
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      /* Green felt-like table background */
-      background: radial-gradient(circle at top, #166534, #065f46 45%, #022c22 80%);
-      color: #e5e7eb;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    header {
-      padding: 0.5rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.98);
-      border-bottom: 1px solid #1f2937;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #166534, #065f46 40%, #022c22 80%);
+  color: #fff;
+  user-select: none;
+}
 
-    header h1 {
-      font-size: 1.2rem;
-      margin: 0;
-    }
+header {
+  padding: 10px 20px;
+  background: #0f172a;
+  border-bottom: 2px solid #1e293b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      font-size: 0.85rem;
-      color: #e5e7eb;
-    }
+header h1 {
+  font-size: 20px;
+  margin: 0;
+}
 
-    button {
-      cursor: pointer;
-      border-radius: 999px;
-      border: none;
-      padding: 0.35rem 0.9rem;
-      font-size: 0.85rem;
-      background: #1d4ed8;
-      color: #f9fafb;
-      font-weight: 600;
-      transition: background 0.15s ease, transform 0.07s ease;
-    }
+button {
+  background: #2563eb;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #fff;
+}
+button:hover {
+  background: #1d4ed8;
+}
 
-    button:hover {
-      background: #2563eb;
-      transform: translateY(-1px);
-    }
+main {
+  padding: 15px;
+}
 
-    main {
-      flex: 1;
-      padding: 0.7rem 0.8rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-    }
+#top-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
 
-    #top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 0 0.3rem;
-    }
+.stock {
+  width: 90px;
+  height: 120px;
+  border-radius: 8px;
+  background-image: var(--card-back-url);
+  background-size: cover;
+  border: 1px solid #000;
+  position: relative;
+  cursor: pointer;
+}
 
-    .pile-label {
-      font-size: 0.8rem;
-      opacity: 0.9;
-      margin-bottom: 0.2rem;
-    }
+.stock-count {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  background: rgba(0,0,0,0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
 
-    .stock,
-    .foundation-slot {
-      width: 80px;
-      height: 112px;
-      border-radius: 8px;
-      border: 1px dashed #4b5563;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      background-color: rgba(15, 23, 42, 0.4);
-    }
+.foundation-slot {
+  width: 90px;
+  height: 120px;
+  border-radius: 8px;
+  border: 2px dashed #ccc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    #stock {
-      background-image: var(--card-back-url);
-      background-size: cover;
-      background-position: center;
-      border: 1px solid #111827;
-      cursor: pointer;
-    }
+#foundations {
+  display: flex;
+  gap: 8px;
+}
 
-    .stock-count {
-      position: absolute;
-      bottom: 4px;
-      right: 6px;
-      font-size: 0.75rem;
-      opacity: 0.9;
-      color: #facc15;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-    }
+#tableau {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
 
-    #foundations {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
+.column {
+  width: 90px;
+  min-height: 120px;
+  position: relative;
+}
 
-    #tableau {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 0.6rem;
-      margin-top: 0.5rem;
-    }
+.card {
+  width: 90px;
+  height: 120px;
+  border-radius: 8px;
+  position: absolute;
+  left: 0;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #333;
+  cursor: pointer;
+}
 
-    .column {
-      width: 80px;
-      position: relative;
-      min-height: 112px;
-    }
+.card.face-down {
+  background-image: var(--card-back-url);
+}
 
-    .card {
-      width: 80px;
-      height: 112px;
-      border-radius: 8px;
-      position: absolute;
-      left: 0;
-      background-size: cover;
-      background-position: center;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.8);
-      transform-origin: center;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      user-select: none;
-    }
+.card.face-up {
+  background: #fff;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  font-weight: bold;
+}
 
-    .card.face-down {
-      background-image: var(--card-back-url);
-      border: 1px solid #111827;
-    }
+.rank-top, .rank-bottom {
+  display: flex;
+  justify-content: space-between;
+}
+.rank-bottom {
+  transform: rotate(180deg);
+}
 
-    .card.face-up {
-      background: #ffffff !important;
-      border: 1px solid #4b5563;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 4px 5px;
-      color: #000000 !important;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+.center-suit {
+  text-align: center;
+  font-size: 32px;
+}
 
-    .card .rank-top,
-    .card .rank-bottom {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.95rem;
-    }
+.suit-spades, .suit-clubs {
+  color: #000;
+}
+.suit-hearts, .suit-diamonds {
+  color: #b91c1c;
+}
 
-    .card .rank-bottom {
-      transform: rotate(180deg);
-    }
-
-    .card .center-suit {
-      font-size: 2.1rem;
-      text-align: center;
-    }
-
-    .suit {
-      font-weight: 700;
-    }
-
-    .suit-spades,
-    .suit-clubs {
-      color: #065f46; /* greenish-black */
-    }
-
-    .suit-hearts,
-    .suit-diamonds {
-      color: #b91c1c; /* red suits */
-    }
-
-    .card.selected {
-      box-shadow: 0 0 0 2px #facc15, 0 8px 20px rgba(250, 204, 21, 0.6);
-      transform: translateY(-4px);
-    }
-
-    .hint-text {
-      font-size: 0.78rem;
-      opacity: 0.9;
-      padding-left: 0.3rem;
-      color: #e5e7eb;
-    }
-
-    @media (max-width: 900px) {
-      .card,
-      .stock,
-      .foundation-slot,
-      .column {
-        width: 64px;
-        height: 90px;
-      }
-    }
-  </style>
+.card.selected {
+  outline: 3px solid gold;
+  transform: translateY(-5px);
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Spider Solitaire – Flower Backs (4 Suits)</h1>
-    <div class="controls">
-      <button id="newGameBtn">New Game</button>
-    </div>
-  </header>
+<header>
+  <h1>Spider Solitaire — Fixed Version</h1>
+  <button id="newGameBtn">New Game</button>
+</header>
 
-  <main>
-    <div id="top-row">
-      <div>
-        <div class="pile-label">Stock</div>
-        <div id="stock" class="stock">
-          <span class="stock-count" id="stockCount"></span>
-        </div>
-        <div class="hint-text">Click stock to deal one row of cards</div>
-      </div>
-
-      <div>
-        <div class="pile-label">Completed Runs</div>
-        <div id="foundations">
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-          <div class="foundation-slot"></div>
-        </div>
-      </div>
+<main>
+  <div id="top-row">
+    <div>
+      <div class="stock" id="stock"><span id="stockCount" class="stock-count"></span></div>
     </div>
 
-    <div class="hint-text">
-      Build down in rank on any suit. Only pure K→A runs in one suit are removed.
-      Click a face-up card to select its sequence, then click another column to move it.
-      <br />
-      <strong>Double-click a card</strong> to auto-move its sequence onto the next higher card if possible.
+    <div id="foundations">
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
+      <div class="foundation-slot"></div>
     </div>
+  </div>
 
-    <section id="tableau">
-      <div class="column" data-column="0"></div>
-      <div class="column" data-column="1"></div>
-      <div class="column" data-column="2"></div>
-      <div class="column" data-column="3"></div>
-      <div class="column" data-column="4"></div>
-      <div class="column" data-column="5"></div>
-      <div class="column" data-column="6"></div>
-      <div class="column" data-column="7"></div>
-      <div class="column" data-column="8"></div>
-      <div class="column" data-column="9"></div>
-    </section>
-  </main>
-
-  <script>
-    // ----- CONSTANTS -----
-    const RANKS = [1,2,3,4,5,6,7,8,9,10,11,12,13]; // A..K
-    const SUITS = ["♠","♥","♦","♣"];
-
-    // ----- STATE -----
-    let deck = [];        // array of card objects
-    let tableaus = [];    // 10 columns, each is array of card IDs
-    let stock = [];       // remaining card IDs
-    let foundations = []; // each completed K→A run
-    let selected = null;  // { col, index }
-
-    const tableauEls = [...document.querySelectorAll(".column")];
-    const stockEl = document.getElementById("stock");
-    const stockCountEl = document.getElementById("stockCount");
-    const foundationEls = [...document.querySelectorAll(".foundation-slot")];
-
-    // ----- SETUP -----
-    function buildDeck() {
-      deck = [];
-      // two full decks (Spider uses 104 cards)
-      for (let copy = 0; copy < 2; copy++) {
-        for (const suit of SUITS) {
-          for (const rank of RANKS) {
-            deck.push({
-              id: deck.length,
-              rank,
-              suit,
-              faceUp: false
-            });
-          }
-        }
-      }
-    }
-
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    function startNewGame() {
-      buildDeck();
-      shuffle(deck);
-
-      tableaus = Array.from({ length: 10 }, () => []);
-      stock = [];
-      foundations = [];
-      selected = null;
-
-      // Deal: first 4 columns get 6 cards, others get 5
-      let index = 0;
-      for (let col = 0; col < 10; col++) {
-        const count = col < 4 ? 6 : 5;
-        for (let i = 0; i < count; i++) {
-          const card = deck[index++];
-          tableaus[col].push(card.id);
-        }
-        // last dealt card face-up
-        const lastId = tableaus[col][tableaus[col].length - 1];
-        deck[lastId].faceUp = true;
-      }
-
-      // remainder -> stock
-      for (; index < deck.length; index++) {
-        stock.push(deck[index].id);
-      }
-
-      renderAll();
-    }
-
-    // ----- RENDERING -----
-    function renderAll() {
-      renderStock();
-      renderTableau();
-      renderFoundations();
-    }
-
-    function renderStock() {
-      stockCountEl.textContent = Math.floor(stock.length / 10);
-    }
-
-    function renderFoundations() {
-      foundationEls.forEach((el, i) => {
-        el.textContent = i < foundations.length ? "K→A" : "";
-      });
-
-      if (foundations.length === 8) {
-        setTimeout(() => {
-          alert("You win! All 8 runs completed.");
-        }, 100);
-      }
-    }
-
-    function rankToSymbol(rank) {
-      if (rank === 1) return "A";
-      if (rank === 11) return "J";
-      if (rank === 12) return "Q";
-      if (rank === 13) return "K";
-      return String(rank);
-    }
-
-    function suitToClass(suit) {
-      if (suit === "♠") return "suit-spades";
-      if (suit === "♣") return "suit-clubs";
-      if (suit === "♥") return "suit-hearts";
-      if (suit === "♦") return "suit-diamonds";
-      return "";
-    }
-
-    function renderTableau() {
-      tableauEls.forEach((colEl, colIndex) => {
-        colEl.innerHTML = "";
-        const colCards = tableaus[colIndex];
-
-        colCards.forEach((cardId, idx) => {
-          const card = deck[cardId];
-          const cardEl = document.createElement("div");
-          cardEl.classList.add("card");
-          cardEl.dataset.column = colIndex;
-          cardEl.dataset.index = idx;
-          cardEl.style.top = `${idx * 24}px`;
-
-          if (card.faceUp) {
-            cardEl.classList.add("face-up");
-            const rankSymbol = rankToSymbol(card.rank);
-            const suitClass = suitToClass(card.suit);
-
-            cardEl.innerHTML = `
-              <div class="rank-top">
-                <span>${rankSymbol}</span>
-                <span class="suit ${suitClass}">${card.suit}</span>
-              </div>
-              <div class="center-suit suit ${suitClass}">${card.suit}</div>
-              <div class="rank-bottom">
-                <span>${rankSymbol}</span>
-                <span class="suit ${suitClass}">${card.suit}</span>
-              </div>
-            `;
-          } else {
-            cardEl.classList.add("face-down");
-          }
-
-          if (selected && selected.col === colIndex && idx >= selected.index) {
-            cardEl.classList.add("selected");
-          }
-
-          cardEl.addEventListener("click", onCardClick);
-          // 🆕 double-click auto-move handler
-          cardEl.addEventListener("dblclick", onCardDoubleClick);
-
-          colEl.appendChild(cardEl);
-        });
-      });
-    }
-
-    // ----- GAME RULES -----
-    // Check that from `index` downward is a proper descending sequence of SAME suit
-    function isSameSuitSequence(col, index) {
-      const ids = tableaus[col];
-      for (let i = index; i < ids.length - 1; i++) {
-        const a = deck[ids[i]];
-        const b = deck[ids[i + 1]];
-        if (!a.faceUp || !b.faceUp) return false;
-        if (a.suit !== b.suit) return false;
-        if (a.rank !== b.rank + 1) return false;
-      }
-      return true;
-    }
-
-    // Build rule: you may place top card of moving stack onto
-    // any face-up card whose rank is exactly 1 higher (suit ignored)
-    function canBuildOn(destCard, movingTop) {
-      return destCard.faceUp && destCard.rank === movingTop.rank + 1;
-    }
-
-    // ----- INTERACTION -----
-    function onCardClick(e) {
-      const col = Number(e.currentTarget.dataset.column);
-      const index = Number(e.currentTarget.dataset.index);
-      const colCards = tableaus[col];
-      const cardId = colCards[index];
-      const card = deck[cardId];
-
-      // Flip face-down top card
-      if (!card.faceUp) {
-        if (index === colCards.length - 1) {
-          card.faceUp = true;
-          renderTableau();
-        }
-        return;
-      }
-
-      // No selection yet: try to select a same-suit descending sequence
-      if (!selected) {
-        if (!isSameSuitSequence(col, index)) return;
-        selected = { col, index };
-        renderTableau();
-        return;
-      }
-
-      // Click inside current selected stack in same column => deselect
-      if (selected.col === col && index >= selected.index) {
-        selected = null;
-        renderTableau();
-        return;
-      }
-
-      // Try to move selected stack to this column
-      if (moveSelectedTo(col)) {
-        selected = null;
-        renderAll();
-        checkForCompletedRuns();
-      } else {
-        // invalid move
-        selected = null;
-        renderTableau();
-      }
-    }
-
-    // 🆕 Double-click handler: auto-move sequence onto a valid “next higher” card
-    function onCardDoubleClick(e) {
-      const col = Number(e.currentTarget.dataset.column);
-      const index = Number(e.currentTarget.dataset.index);
-      const colCards = tableaus[col];
-      const cardId = colCards[index];
-      const card = deck[cardId];
-
-      if (!card.faceUp) return;
-
-      // We only move a valid same-suit descending sequence starting at this card
-      if (!isSameSuitSequence(col, index)) return;
-
-      const movingTop = deck[tableaus[col][index]];
-
-      // Try to find the first column where the top card is exactly one rank higher
-      for (let tcol = 0; tcol < 10; tcol++) {
-        if (tcol === col) continue;
-        const dest = tableaus[tcol];
-        if (dest.length === 0) continue; // don't auto-move to empty columns
-
-        const destTop = deck[dest[dest.length - 1]];
-        if (canBuildOn(destTop, movingTop)) {
-          // Perform the move directly
-          const source = tableaus[col];
-          const movingIds = source.slice(index);
-
-          tableaus[col] = source.slice(0, index);
-          tableaus[tcol] = dest.concat(movingIds);
-
-          const newSource = tableaus[col];
-          if (newSource.length > 0) {
-            deck[newSource[newSource.length - 1]].faceUp = true;
-          }
-
-          selected = null;
-          renderAll();
-          checkForCompletedRuns();
-          return;
-        }
-      }
-      // If no valid target found, do nothing
-    }
-
-    function moveSelectedTo(targetCol) {
-      if (!selected || selected.col === targetCol) return false;
-
-      const fromCol = selected.col;
-      const fromIndex = selected.index;
-
-      const source = tableaus[fromCol];
-      const dest = tableaus[targetCol];
-
-      const movingIds = source.slice(fromIndex);
-      const movingTop = deck[movingIds[0]];
-
-      // Building rules
-      if (dest.length > 0) {
-        const destTop = deck[dest[dest.length - 1]];
-        if (!canBuildOn(destTop, movingTop)) {
-          return false;
-        }
-      }
-      // Empty column always allowed
-
-      // Execute move
-      tableaus[fromCol] = source.slice(0, fromIndex);
-      tableaus[targetCol] = dest.concat(movingIds);
-
-      // Flip new top card in source column if needed
-      const newSource = tableaus[fromCol];
-      if (newSource.length > 0) {
-        deck[newSource[newSource.length - 1]].faceUp = true;
-      }
-
-      return true;
-    }
-
-    function checkForCompletedRuns() {
-      // Look for K→A same-suit sequence at bottom of each column
-      for (let col = 0; col < 10; col++) {
-        const ids = tableaus[col];
-        if (ids.length < 13) continue;
-
-        const sliceStart = ids.length - 13;
-        const chunk = ids.slice(sliceStart);
-
-        let suit = deck[chunk[0]].suit;
-        let isRun = true;
-
-        for (let i = 0; i < 13; i++) {
-          const card = deck[chunk[i]];
-          if (!card.faceUp) {
-            isRun = false;
-            break;
-          }
-          if (card.suit !== suit) {
-            isRun = false;
-            break;
-          }
-          if (card.rank !== 13 - i) { // K (13) down to A (1)
-            isRun = false;
-            break;
-          }
-        }
-
-        if (isRun) {
-          // remove from column
-          tableaus[col] = ids.slice(0, sliceStart);
-          foundations.push(chunk);
-
-          // flip new top if present
-          const remaining = tableaus[col];
-          if (remaining.length > 0) {
-            deck[remaining[remaining.length - 1]].faceUp = true;
-          }
-        }
-      }
-      renderAll();
-    }
-
-    // Deal from stock: one face-up card to each column, but only if no column empty
-    stockEl.addEventListener("click", () => {
-      if (stock.length === 0) return;
-
-      // Can't deal if any column is empty
-      for (let col = 0; col < 10; col++) {
-        if (tableaus[col].length === 0) return;
-      }
-
-      selected = null;
-
-      for (let col = 0; col < 10; col++) {
-        const cardId = stock.pop();
-        const card = deck[cardId];
-        card.faceUp = true;
-        tableaus[col].push(cardId);
-      }
-
-      renderAll();
-      checkForCompletedRuns();
-    });
-
-    document.getElementById("newGameBtn").addEventListener("click", startNewGame);
-
-    // ----- START -----
-    startNewGame();
-  </script>
-</body>
-</html>
+  <section id="tableau">
+    <div class="column" data-column="0"></div>
+    <div class="column" data-column="1"></div>
+    <div class="column" data-column="2"></div>
+    <div class="column" data-column="3"></div>
+    <div class="column" data-column="4"></div>
+    <div class="column" data-column="5"></div>
+    <div class="column" data-column="6"></div>
+    <div class="column" data-column="7"></div>
+    <div class="column" data-column="8"></div>
+    <div class="column" data-column="9"></div>
+  </section>
+</main>
