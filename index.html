@@ -197,3 +197,360 @@ main {
     <div class="column" data-column="9"></div>
   </section>
 </main>
+<script>
+/* -----------------------------------------
+   SPIDER SOLITAIRE — FIXED ENGINE
+   ----------------------------------------- */
+
+const RANKS = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+const SUITS = ["♠","♥","♦","♣"];  // 4-suit spider
+
+let deck = [];
+let tableaus = [];
+let stock = [];
+let foundations = [];
+let selected = null;
+
+const tableauEls = [...document.querySelectorAll(".column")];
+const stockEl = document.getElementById("stock");
+const stockCountEl = document.getElementById("stockCount");
+const foundationEls = [...document.querySelectorAll(".foundation-slot")];
+
+
+/* -----------------------------------------
+   BUILD 104-CARD DECK (2 FULL DECKS)
+   ----------------------------------------- */
+function buildDeck() {
+  deck = [];
+  for (let copy = 0; copy < 2; copy++) {
+    for (const suit of SUITS) {
+      for (const rank of RANKS) {
+        deck.push({
+          id: deck.length,
+          suit,
+          rank,
+          faceUp: false
+        });
+      }
+    }
+  }
+}
+
+/* Fisher-Yates shuffle */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+/* -----------------------------------------
+   GAME SETUP
+   ----------------------------------------- */
+function startNewGame() {
+  buildDeck();
+  shuffle(deck);
+
+  tableaus = Array.from({length: 10}, () => []);
+  stock = [];
+  foundations = [];
+  selected = null;
+
+  /* Deal: first 4 columns get 6, rest get 5 */
+  let index = 0;
+  for (let col = 0; col < 10; col++) {
+    let count = col < 4 ? 6 : 5;
+    for (let i = 0; i < count; i++) {
+      let card = deck[index++];
+      tableaus[col].push(card.id);
+    }
+    let lastId = tableaus[col][tableaus[col].length - 1];
+    deck[lastId].faceUp = true;
+  }
+
+  /* Remaining cards into stock */
+  while (index < deck.length) stock.push(deck[index++].id);
+
+  renderAll();
+}
+
+
+/* -----------------------------------------
+   RENDERING
+   ----------------------------------------- */
+function renderAll() {
+  renderStock();
+  renderFoundations();
+  renderTableau();
+}
+
+function renderStock() {
+  stockCountEl.textContent = Math.floor(stock.length / 10);
+}
+
+function renderFoundations() {
+  foundationEls.forEach((el,i) => {
+    el.textContent = i < foundations.length ? "K→A" : "";
+  });
+}
+
+function rankToSymbol(rank) {
+  return rank === 1 ? "A" :
+         rank === 11 ? "J" :
+         rank === 12 ? "Q" :
+         rank === 13 ? "K" :
+         rank;
+}
+
+function suitClass(suit) {
+  return suit === "♠" ? "suit-spades" :
+         suit === "♣" ? "suit-clubs" :
+         suit === "♥" ? "suit-hearts" :
+         "suit-diamonds";
+}
+
+
+/* -----------------------------------------
+   RENDER TABLEAU
+   ----------------------------------------- */
+function renderTableau() {
+  tableauEls.forEach((colEl, colIndex) => {
+    colEl.innerHTML = "";
+    const colCards = tableaus[colIndex];
+
+    colCards.forEach((cardId, idx) => {
+      const card = deck[cardId];
+      const cardEl = document.createElement("div");
+      cardEl.classList.add("card");
+      cardEl.dataset.column = colIndex;
+      cardEl.dataset.index = idx;
+      cardEl.style.top = `${idx * 24}px`;
+
+      if (!card.faceUp) {
+        cardEl.classList.add("face-down");
+      } else {
+        cardEl.classList.add("face-up");
+        const rank = rankToSymbol(card.rank);
+        const sClass = suitClass(card.suit);
+
+        cardEl.innerHTML = `
+          <div class="rank-top">
+            <span>${rank}</span>
+            <span class="suit ${sClass}">${card.suit}</span>
+          </div>
+          <div class="center-suit suit ${sClass}">${card.suit}</div>
+          <div class="rank-bottom">
+            <span>${rank}</span>
+            <span class="suit ${sClass}">${card.suit}</span>
+          </div>
+        `;
+      }
+
+      if (selected && selected.col === colIndex && idx >= selected.index) {
+        cardEl.classList.add("selected");
+      }
+
+      cardEl.addEventListener("click", onCardClick);
+      cardEl.addEventListener("dblclick", onCardDoubleClick);
+
+      colEl.appendChild(cardEl);
+    });
+  });
+}
+
+
+/* -----------------------------------------
+   MOVE / SEQUENCE LOGIC
+   ----------------------------------------- */
+
+/* Ensure sequence from index downward is same-suit descending */
+function isSameSuitSequence(col, index) {
+  const ids = tableaus[col];
+  for (let i = index; i < ids.length - 1; i++) {
+    const a = deck[ids[i]];
+    const b = deck[ids[i+1]];
+    if (!a.faceUp || !b.faceUp) return false;
+    if (a.suit !== b.suit) return false;
+    if (a.rank !== b.rank + 1) return false;
+  }
+  return true;
+}
+
+/* Can we build movingTop onto destTop? */
+function canBuildOn(destTop, movingTop) {
+  return destTop.faceUp && destTop.rank === movingTop.rank + 1;
+}
+
+
+/* -----------------------------------------
+   CLICK HANDLER
+   ----------------------------------------- */
+function onCardClick(e) {
+  const col = Number(e.currentTarget.dataset.column);
+  const index = Number(e.currentTarget.dataset.index);
+  const colCards = tableaus[col];
+  const card = deck[colCards[index]];
+
+  /* Flip face-down if on top */
+  if (!card.faceUp) {
+    if (index === colCards.length - 1) {
+      card.faceUp = true;
+      renderTableau();
+    }
+    return;
+  }
+
+  /* Select */
+  if (!selected) {
+    if (!isSameSuitSequence(col, index)) return;
+    selected = { col, index };
+    renderTableau();
+    return;
+  }
+
+  /* Deselect by clicking same stack */
+  if (selected.col === col && index >= selected.index) {
+    selected = null;
+    renderTableau();
+    return;
+  }
+
+  /* Move to column */
+  if (moveSequence(selected.col, selected.index, col)) {
+    selected = null;
+    renderAll();
+    checkForCompletedRun();
+  } else {
+    selected = null;
+    renderTableau();
+  }
+}
+
+
+/* -----------------------------------------
+   DOUBLE-CLICK AUTO-MOVE
+   ----------------------------------------- */
+function onCardDoubleClick(e) {
+  const col = Number(e.currentTarget.dataset.column);
+  const index = Number(e.currentTarget.dataset.index);
+
+  if (!isSameSuitSequence(col, index)) return;
+
+  const movingTop = deck[tableaus[col][index]];
+
+  /* Try all columns */
+  for (let tcol = 0; tcol < 10; tcol++) {
+    if (tcol === col) continue;
+
+    const dest = tableaus[tcol];
+    if (dest.length === 0) continue; // don't auto-move to empty
+
+    const destTop = deck[dest[dest.length - 1]];
+    if (canBuildOn(destTop, movingTop)) {
+      moveSequence(col, index, tcol);
+      renderAll();
+      checkForCompletedRun();
+      return;
+    }
+  }
+}
+
+
+/* -----------------------------------------
+   MOVE A SEQUENCE
+   ----------------------------------------- */
+function moveSequence(fromCol, fromIndex, toCol) {
+
+  const source = tableaus[fromCol];
+  const dest = tableaus[toCol];
+  const movingIds = source.slice(fromIndex);
+  const movingTop = deck[movingIds[0]];
+
+  /* Empty column always allowed */
+  if (dest.length > 0) {
+    const destTop = deck[dest[dest.length - 1]];
+    if (!canBuildOn(destTop, movingTop))
+      return false;
+  }
+
+  /* Perform move */
+  tableaus[fromCol] = source.slice(0, fromIndex);
+  tableaus[toCol] = dest.concat(movingIds);
+
+  /* Flip new top of source */
+  const src = tableaus[fromCol];
+  if (src.length > 0) deck[src[src.length - 1]].faceUp = true;
+
+  return true;
+}
+
+
+/* -----------------------------------------
+   CHECK IF RUN COMPLETE (K→A same suit)
+   ----------------------------------------- */
+function checkForCompletedRun() {
+  for (let col = 0; col < 10; col++) {
+    let ids = tableaus[col];
+    if (ids.length < 13) continue;
+
+    let slice = ids.slice(ids.length - 13);
+    let suit = deck[slice[0]].suit;
+    let ok = true;
+
+    for (let i = 0; i < 13; i++) {
+      let card = deck[slice[i]];
+      if (!card.faceUp || card.suit !== suit || card.rank !== 13 - i) {
+        ok = false;
+        break;
+      }
+    }
+
+    if (ok) {
+      tableaus[col] = ids.slice(0, ids.length - 13);
+      foundations.push(slice);
+
+      const remain = tableaus[col];
+      if (remain.length > 0) deck[remain[remain.length - 1]].faceUp = true;
+
+      renderAll();
+    }
+  }
+}
+
+
+/* -----------------------------------------
+   DEAL FROM STOCK
+   ----------------------------------------- */
+stockEl.addEventListener("click", () => {
+  if (stock.length === 0) return;
+
+  /* Cannot deal if any column is empty */
+  for (let col = 0; col < 10; col++) {
+    if (tableaus[col].length === 0) return;
+  }
+
+  for (let col = 0; col < 10; col++) {
+    const cardId = stock.pop();
+    const card = deck[cardId];
+    card.faceUp = true;
+    tableaus[col].push(cardId);
+  }
+
+  selected = null;
+  renderAll();
+});
+
+
+/* -----------------------------------------
+   NEW GAME BUTTON
+   ----------------------------------------- */
+document.getElementById("newGameBtn").addEventListener("click", startNewGame);
+
+
+/* -----------------------------------------
+   START GAME
+   ----------------------------------------- */
+startNewGame();
+</script>
+</body>
+</html>
