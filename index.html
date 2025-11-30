@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Spider Solitaire – Fixed Version</title>
+<title>Spider Solitaire — Flower Backs</title>
 
 <style>
 :root {
@@ -15,9 +15,10 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background: radial-gradient(circle at top, #166534, #065f46 40%, #022c22 80%);
-  color: #fff;
+  color: #f9fafb;
   user-select: none;
 }
 
@@ -28,24 +29,50 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 header h1 {
-  font-size: 20px;
+  font-size: 18px;
   margin: 0;
+  white-space: nowrap;
 }
 
-button {
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.difficulty {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.diff-btn,
+#newGameBtn {
   background: #2563eb;
   border: none;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  color: #fff;
+  color: #f9fafb;
+  transition: background 0.15s ease, transform 0.08s ease,
+    box-shadow 0.15s ease;
 }
-button:hover {
+
+.diff-btn:hover,
+#newGameBtn:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.diff-btn.active {
+  background: #facc15;
+  color: #111827;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.8);
 }
 
 main {
@@ -56,6 +83,7 @@ main {
   display: flex;
   justify-content: space-between;
   padding: 0 20px;
+  align-items: flex-start;
 }
 
 .stock {
@@ -73,7 +101,7 @@ main {
   position: absolute;
   bottom: 4px;
   right: 6px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.6);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
@@ -83,10 +111,12 @@ main {
   width: 90px;
   height: 120px;
   border-radius: 8px;
-  border: 2px dashed #ccc;
+  border: 2px dashed #9ca3af;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.8rem;
+  color: #d1d5db;
 }
 
 #foundations {
@@ -94,8 +124,14 @@ main {
   gap: 8px;
 }
 
+#hint {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 8px 20px 0;
+}
+
 #tableau {
-  margin-top: 30px;
+  margin-top: 24px;
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -115,8 +151,9 @@ main {
   left: 0;
   background-size: cover;
   background-position: center;
-  border: 1px solid #333;
+  border: 1px solid #111827;
   cursor: pointer;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.9);
 }
 
 .card.face-down {
@@ -124,18 +161,20 @@ main {
 }
 
 .card.face-up {
-  background: #fff;
-  color: #000;
+  background: #ffffff;
+  color: #111827;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 6px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-.rank-top, .rank-bottom {
+.rank-top,
+.rank-bottom {
   display: flex;
   justify-content: space-between;
+  font-size: 0.9rem;
 }
 .rank-bottom {
   transform: rotate(180deg);
@@ -143,33 +182,74 @@ main {
 
 .center-suit {
   text-align: center;
-  font-size: 32px;
+  font-size: 2rem;
 }
 
-.suit-spades, .suit-clubs {
-  color: #000;
+.suit {
+  font-weight: 700;
 }
-.suit-hearts, .suit-diamonds {
+
+.suit-spades,
+.suit-clubs {
+  color: #000000;
+}
+.suit-hearts,
+.suit-diamonds {
   color: #b91c1c;
 }
 
 .card.selected {
-  outline: 3px solid gold;
+  outline: 3px solid #facc15;
   transform: translateY(-5px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  header h1 {
+    font-size: 16px;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  #tableau {
+    gap: 8px;
+  }
+  .column,
+  .card,
+  .stock,
+  .foundation-slot {
+    width: 70px;
+    height: 95px;
+  }
 }
 </style>
 </head>
 
 <body>
 <header>
-  <h1>Spider Solitaire — Fixed Version</h1>
-  <button id="newGameBtn">New Game</button>
+  <h1>Spider Solitaire — Flower Backs</h1>
+  <div class="header-right">
+    <div class="difficulty">
+      <button class="diff-btn active" data-diff="easy">Easy (1 Suit)</button>
+      <button class="diff-btn" data-diff="medium">Medium (2 Suits)</button>
+      <button class="diff-btn" data-diff="hard">Hard (4 Suits)</button>
+    </div>
+    <button id="newGameBtn">New Game</button>
+  </div>
 </header>
 
 <main>
   <div id="top-row">
     <div>
-      <div class="stock" id="stock"><span id="stockCount" class="stock-count"></span></div>
+      <div class="stock" id="stock">
+        <span id="stockCount" class="stock-count"></span>
+      </div>
     </div>
 
     <div id="foundations">
@@ -182,6 +262,11 @@ main {
       <div class="foundation-slot"></div>
       <div class="foundation-slot"></div>
     </div>
+  </div>
+
+  <div id="hint">
+    Build down in rank on any suit. Only pure K→A runs in one suit are removed.
+    Click a card to move sequences. Double-click to auto-move onto the next higher card if possible.
   </div>
 
   <section id="tableau">
@@ -197,13 +282,15 @@ main {
     <div class="column" data-column="9"></div>
   </section>
 </main>
+
 <script>
 /* -----------------------------------------
-   SPIDER SOLITAIRE — FIXED ENGINE
+   SPIDER SOLITAIRE ENGINE (with difficulty)
    ----------------------------------------- */
 
 const RANKS = [1,2,3,4,5,6,7,8,9,10,11,12,13];
-const SUITS = ["♠","♥","♦","♣"];  // 4-suit spider
+
+let currentDifficulty = "easy"; // "easy" | "medium" | "hard"
 
 let deck = [];
 let tableaus = [];
@@ -215,15 +302,43 @@ const tableauEls = [...document.querySelectorAll(".column")];
 const stockEl = document.getElementById("stock");
 const stockCountEl = document.getElementById("stockCount");
 const foundationEls = [...document.querySelectorAll(".foundation-slot")];
+const diffButtons = [...document.querySelectorAll(".diff-btn")];
 
+/* ---------- Difficulty handling ---------- */
 
-/* -----------------------------------------
-   BUILD 104-CARD DECK (2 FULL DECKS)
-   ----------------------------------------- */
+diffButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const diff = btn.dataset.diff;
+    currentDifficulty = diff;
+    diffButtons.forEach(b => b.classList.toggle("active", b === btn));
+    startNewGame();
+  });
+});
+
+/* ---------- Deck building based on difficulty ---------- */
+
 function buildDeck() {
   deck = [];
-  for (let copy = 0; copy < 2; copy++) {
-    for (const suit of SUITS) {
+
+  let suits;
+  let copiesPerSuit;
+
+  if (currentDifficulty === "easy") {
+    // 1 suit — 8 copies of each rank (104 cards)
+    suits = ["♠"];
+    copiesPerSuit = 8;
+  } else if (currentDifficulty === "medium") {
+    // 2 suits — 4 copies each (2 decks)
+    suits = ["♠", "♥"];
+    copiesPerSuit = 4;
+  } else {
+    // hard: 4 suits — 2 copies each (2 decks)
+    suits = ["♠", "♥", "♦", "♣"];
+    copiesPerSuit = 2;
+  }
+
+  for (const suit of suits) {
+    for (let copy = 0; copy < copiesPerSuit; copy++) {
       for (const rank of RANKS) {
         deck.push({
           id: deck.length,
@@ -236,7 +351,7 @@ function buildDeck() {
   }
 }
 
-/* Fisher-Yates shuffle */
+/* Fisher–Yates shuffle */
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -244,9 +359,8 @@ function shuffle(arr) {
   }
 }
 
-/* -----------------------------------------
-   GAME SETUP
-   ----------------------------------------- */
+/* ---------- New game ---------- */
+
 function startNewGame() {
   buildDeck();
   shuffle(deck);
@@ -256,28 +370,24 @@ function startNewGame() {
   foundations = [];
   selected = null;
 
-  /* Deal: first 4 columns get 6, rest get 5 */
   let index = 0;
   for (let col = 0; col < 10; col++) {
-    let count = col < 4 ? 6 : 5;
+    const count = col < 4 ? 6 : 5;
     for (let i = 0; i < count; i++) {
-      let card = deck[index++];
+      const card = deck[index++];
       tableaus[col].push(card.id);
     }
-    let lastId = tableaus[col][tableaus[col].length - 1];
+    const lastId = tableaus[col][tableaus[col].length - 1];
     deck[lastId].faceUp = true;
   }
 
-  /* Remaining cards into stock */
   while (index < deck.length) stock.push(deck[index++].id);
 
   renderAll();
 }
 
+/* ---------- Rendering ---------- */
 
-/* -----------------------------------------
-   RENDERING
-   ----------------------------------------- */
 function renderAll() {
   renderStock();
   renderFoundations();
@@ -289,30 +399,30 @@ function renderStock() {
 }
 
 function renderFoundations() {
-  foundationEls.forEach((el,i) => {
+  foundationEls.forEach((el, i) => {
     el.textContent = i < foundations.length ? "K→A" : "";
   });
+
+  if (foundations.length === 8) {
+    setTimeout(() => alert("You win! All 8 runs completed."), 100);
+  }
 }
 
 function rankToSymbol(rank) {
-  return rank === 1 ? "A" :
-         rank === 11 ? "J" :
-         rank === 12 ? "Q" :
-         rank === 13 ? "K" :
-         rank;
+  if (rank === 1) return "A";
+  if (rank === 11) return "J";
+  if (rank === 12) return "Q";
+  if (rank === 13) return "K";
+  return String(rank);
 }
 
 function suitClass(suit) {
-  return suit === "♠" ? "suit-spades" :
-         suit === "♣" ? "suit-clubs" :
-         suit === "♥" ? "suit-hearts" :
-         "suit-diamonds";
+  if (suit === "♠") return "suit-spades";
+  if (suit === "♣") return "suit-clubs";
+  if (suit === "♥") return "suit-hearts";
+  return "suit-diamonds";
 }
 
-
-/* -----------------------------------------
-   RENDER TABLEAU
-   ----------------------------------------- */
 function renderTableau() {
   tableauEls.forEach((colEl, colIndex) => {
     colEl.innerHTML = "";
@@ -332,7 +442,6 @@ function renderTableau() {
         cardEl.classList.add("face-up");
         const rank = rankToSymbol(card.rank);
         const sClass = suitClass(card.suit);
-
         cardEl.innerHTML = `
           <div class="rank-top">
             <span>${rank}</span>
@@ -352,23 +461,19 @@ function renderTableau() {
 
       cardEl.addEventListener("click", onCardClick);
       cardEl.addEventListener("dblclick", onCardDoubleClick);
-
       colEl.appendChild(cardEl);
     });
   });
 }
 
+/* ---------- Sequence & move rules ---------- */
 
-/* -----------------------------------------
-   MOVE / SEQUENCE LOGIC
-   ----------------------------------------- */
-
-/* Ensure sequence from index downward is same-suit descending */
+// True if from index downward is a same-suit descending sequence
 function isSameSuitSequence(col, index) {
   const ids = tableaus[col];
   for (let i = index; i < ids.length - 1; i++) {
     const a = deck[ids[i]];
-    const b = deck[ids[i+1]];
+    const b = deck[ids[i + 1]];
     if (!a.faceUp || !b.faceUp) return false;
     if (a.suit !== b.suit) return false;
     if (a.rank !== b.rank + 1) return false;
@@ -376,22 +481,20 @@ function isSameSuitSequence(col, index) {
   return true;
 }
 
-/* Can we build movingTop onto destTop? */
+// Can we build movingTop onto destTop?
 function canBuildOn(destTop, movingTop) {
   return destTop.faceUp && destTop.rank === movingTop.rank + 1;
 }
 
+/* ---------- Click / double-click handlers ---------- */
 
-/* -----------------------------------------
-   CLICK HANDLER
-   ----------------------------------------- */
 function onCardClick(e) {
   const col = Number(e.currentTarget.dataset.column);
   const index = Number(e.currentTarget.dataset.index);
   const colCards = tableaus[col];
   const card = deck[colCards[index]];
 
-  /* Flip face-down if on top */
+  // Flip top face-down card
   if (!card.faceUp) {
     if (index === colCards.length - 1) {
       card.faceUp = true;
@@ -400,22 +503,22 @@ function onCardClick(e) {
     return;
   }
 
-  /* Select */
   if (!selected) {
+    // select a same-suit descending sequence (or single card)
     if (!isSameSuitSequence(col, index)) return;
     selected = { col, index };
     renderTableau();
     return;
   }
 
-  /* Deselect by clicking same stack */
+  // Click inside selected stack → deselect
   if (selected.col === col && index >= selected.index) {
     selected = null;
     renderTableau();
     return;
   }
 
-  /* Move to column */
+  // Try move selected stack
   if (moveSequence(selected.col, selected.index, col)) {
     selected = null;
     renderAll();
@@ -426,10 +529,6 @@ function onCardClick(e) {
   }
 }
 
-
-/* -----------------------------------------
-   DOUBLE-CLICK AUTO-MOVE
-   ----------------------------------------- */
 function onCardDoubleClick(e) {
   const col = Number(e.currentTarget.dataset.column);
   const index = Number(e.currentTarget.dataset.index);
@@ -438,16 +537,16 @@ function onCardDoubleClick(e) {
 
   const movingTop = deck[tableaus[col][index]];
 
-  /* Try all columns */
+  // find first column with valid top card one rank higher
   for (let tcol = 0; tcol < 10; tcol++) {
     if (tcol === col) continue;
-
     const dest = tableaus[tcol];
     if (dest.length === 0) continue; // don't auto-move to empty
 
     const destTop = deck[dest[dest.length - 1]];
     if (canBuildOn(destTop, movingTop)) {
       moveSequence(col, index, tcol);
+      selected = null;
       renderAll();
       checkForCompletedRun();
       return;
@@ -455,50 +554,46 @@ function onCardDoubleClick(e) {
   }
 }
 
+/* ---------- Core move function ---------- */
 
-/* -----------------------------------------
-   MOVE A SEQUENCE
-   ----------------------------------------- */
 function moveSequence(fromCol, fromIndex, toCol) {
+  if (fromCol === toCol) return false;
 
   const source = tableaus[fromCol];
   const dest = tableaus[toCol];
   const movingIds = source.slice(fromIndex);
   const movingTop = deck[movingIds[0]];
 
-  /* Empty column always allowed */
+  // if target not empty, must build correctly
   if (dest.length > 0) {
     const destTop = deck[dest[dest.length - 1]];
-    if (!canBuildOn(destTop, movingTop))
-      return false;
+    if (!canBuildOn(destTop, movingTop)) return false;
   }
 
-  /* Perform move */
+  // perform move
   tableaus[fromCol] = source.slice(0, fromIndex);
   tableaus[toCol] = dest.concat(movingIds);
 
-  /* Flip new top of source */
+  // flip new top of source if needed
   const src = tableaus[fromCol];
   if (src.length > 0) deck[src[src.length - 1]].faceUp = true;
 
   return true;
 }
 
+/* ---------- Completed run detection ---------- */
 
-/* -----------------------------------------
-   CHECK IF RUN COMPLETE (K→A same suit)
-   ----------------------------------------- */
 function checkForCompletedRun() {
   for (let col = 0; col < 10; col++) {
-    let ids = tableaus[col];
+    const ids = tableaus[col];
     if (ids.length < 13) continue;
 
-    let slice = ids.slice(ids.length - 13);
-    let suit = deck[slice[0]].suit;
+    const slice = ids.slice(ids.length - 13);
+    const suit = deck[slice[0]].suit;
     let ok = true;
 
     for (let i = 0; i < 13; i++) {
-      let card = deck[slice[i]];
+      const card = deck[slice[i]];
       if (!card.faceUp || card.suit !== suit || card.rank !== 13 - i) {
         ok = false;
         break;
@@ -510,21 +605,19 @@ function checkForCompletedRun() {
       foundations.push(slice);
 
       const remain = tableaus[col];
-      if (remain.length > 0) deck[remain[remain.length - 1]].faceUp = true;
-
+      if (remain.length > 0) {
+        deck[remain[remain.length - 1]].faceUp = true;
+      }
       renderAll();
     }
   }
 }
 
+/* ---------- Stock dealing ---------- */
 
-/* -----------------------------------------
-   DEAL FROM STOCK
-   ----------------------------------------- */
 stockEl.addEventListener("click", () => {
   if (stock.length === 0) return;
-
-  /* Cannot deal if any column is empty */
+  // cannot deal if any column is empty
   for (let col = 0; col < 10; col++) {
     if (tableaus[col].length === 0) return;
   }
@@ -540,16 +633,12 @@ stockEl.addEventListener("click", () => {
   renderAll();
 });
 
+/* ---------- New game ---------- */
 
-/* -----------------------------------------
-   NEW GAME BUTTON
-   ----------------------------------------- */
 document.getElementById("newGameBtn").addEventListener("click", startNewGame);
 
+/* ---------- Start ---------- */
 
-/* -----------------------------------------
-   START GAME
-   ----------------------------------------- */
 startNewGame();
 </script>
 </body>
